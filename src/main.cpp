@@ -78,9 +78,9 @@ Smoothed <int> ulkaPowerAverage;
 double ulkaKp=30.0, ulkaKi=20 , ulkaKd=0;
 PID pumpPID(&ulkaInput, &ulkaOutput, &ulkaSetpoint, ulkaKp, ulkaKi, ulkaKd, DIRECT);
 
-//hw_timer_t *ulkaPulseTimer = NULL;
-//int frequencyCounter = 0;
-//int pulsesRequiredPerSecond = 1;
+hw_timer_t *ulkaPulseTimer = NULL;
+int frequencyCounter = 0;
+int pulsesRequiredPerSecond = 1;
 
 
 //Default Extraction Profile
@@ -556,49 +556,47 @@ void preInfuse (float seconds, float pressure, int setting, float temperature, i
 //  ULKA PUMP FUNCTIONS
 //***********************************************************************//
 
-//void IRAM_ATTR zcTrigger(){
-  //timerRestart(ulkaPulseTimer);
-//}
+void IRAM_ATTR zcTrigger(){
+  timerRestart(ulkaPulseTimer);
+}
 
-//void IRAM_ATTR onUlkaPulseTimer(){
-  //if (frequencyCounter < 50){
-  //  detachInterrupt(zerocross);
-  //  if (frequencyCounter < pulsesRequiredPerSecond){
-  //    digitalWrite(outputPin, HIGH); 
-
-  //  }
-  //  else{
-  //    digitalWrite(outputPin, LOW); 
-  //  }
-  //  frequencyCounter = frequencyCounter + 1;
-  //}
-  //else {
-  //  frequencyCounter = 0;
-    //timerStop(ulkaPulseTimer);
-    //timerRestart(ulkaPulseTimer);
-  //  attachInterrupt(zerocross, zcTrigger, RISING);
-  //}
- 
-//}
+void IRAM_ATTR onUlkaPulseTimer(){
+  if (frequencyCounter < 50){
+    detachInterrupt(zerocross);
+    if (frequencyCounter < pulsesRequiredPerSecond){
+      digitalWrite(outputPin, HIGH); 
+    }
+    else{
+      digitalWrite(outputPin, LOW); 
+    }
+    frequencyCounter = frequencyCounter + 1;
+  }
+  else {
+    frequencyCounter = 0;
+    timerStop(ulkaPulseTimer);
+    timerRestart(ulkaPulseTimer);
+    attachInterrupt(zerocross, zcTrigger, RISING);
+  } 
+}
 
 
 void setupUlkaPump(){
-  ulka.begin(NORMAL_MODE, ON);
-  ulka.setPower(0);
+  //ulka.begin(NORMAL_MODE, ON);
+  //ulka.setPower(0);
 
   pumpPID.SetMode(AUTOMATIC);
   
   ulkaPowerAverage.begin(SMOOTHED_AVERAGE, 30);
   ulkaPowerAverage.clear();
 
-  //ulkaPulseTimer = timerBegin(0,80,true);
-  //timerAttachInterrupt(ulkaPulseTimer, &onUlkaPulseTimer, true); 
-  //timerAlarmWrite(ulkaPulseTimer, 20000, true);
-  //timerAlarmEnable(ulkaPulseTimer);
+  ulkaPulseTimer = timerBegin(0,80,true);
+  timerAttachInterrupt(ulkaPulseTimer, &onUlkaPulseTimer, true); 
+  timerAlarmWrite(ulkaPulseTimer, 20000, true);
+  timerAlarmEnable(ulkaPulseTimer);
 
-  //pinMode(zerocross, INPUT);
-  //pinMode(outputPin, OUTPUT);
-  //attachInterrupt(zerocross, zcTrigger, RISING);
+  pinMode(zerocross, INPUT);
+  pinMode(outputPin, OUTPUT);
+  attachInterrupt(zerocross, zcTrigger, RISING);
 }
 
 
@@ -653,7 +651,7 @@ void updatePump (double barsPerSecond, double targetPressure, double targetFlowR
       break;
   }
   //ulka.setPower(ulkaPower);
-  ulka.setPower(ulkaPowerAverage.get());
+  //ulka.setPower(ulkaPowerAverage.get());
   
 }
 
