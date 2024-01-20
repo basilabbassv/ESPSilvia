@@ -72,7 +72,7 @@ ZACwire Sensor(TEMPERATURE_SENSOR_PIN,306);
 #define zerocross  23
 #define ULKA_MIN_POWER 30
 #define ULKA_MAX_POWER 97 
-dimmerLamp ulka(outputPin, zerocross);
+//dimmerLamp ulka(outputPin, zerocross);
 double ulkaSetpoint, ulkaInput, ulkaOutput, ulkaPower;
 Smoothed <int> ulkaPowerAverage;
 double ulkaKp=30.0, ulkaKi=20 , ulkaKd=0;
