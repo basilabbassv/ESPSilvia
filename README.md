@@ -1,5 +1,7 @@
 ESP32 powered Rancilio Silvia
 
+You can support me on Patreon patreon.com/ESPSilvia
+
 Features.
 1. Wifi and Bluetooth Enabaled.
 2. Supports upto 3 temperature sensors. 
@@ -22,6 +24,9 @@ https://vi.aliexpress.com/item/32864722159.html?pdp_npi=4%40dis%21USD%21US%20%24
 AC Dimmer - RobotDyn
 https://vi.aliexpress.com/item/32802025086.html?pdp_npi=4%40dis%21USD%21US%20%242.49%21US%20%242.44%21%21%212.49%212.44%21%402101253517059977093234021da926%2112000021790017823%21sh01%21AE%21119398870%21&spm=a2g0o.store_pc_home.productList_2006959807184.32802025086
 
+Temperature Sensor - Precise temperate sensor upto 150C
+https://www.digikey.com/en/products/detail/innovative-sensor-technology-usa-division/TSIC-306-TO92/13181022
+
 HX711 Scale and Load Cells 1KG
 https://vi.aliexpress.com/item/33046037411.html?pdp_npi=4%40dis%21USD%21US%20%240.48%21US%20%240.48%21%21%210.48%210.48%21%402141233517059977710048880dc1c6%2167466940814%21sh01%21AE%21119398870%21&spm=a2g0o.store_pc_home.productList_6000495559900.33046037411
 
@@ -36,3 +41,6 @@ https://www.aliexpress.com/item/1005005654314303.html?spm=a2g0o.productlist.main
 
 Fortec SSR for Boiler 40A
 https://www.aliexpress.com/item/1005005757882881.html?spm=a2g0o.productlist.main.1.7d8724a3rxIews&algo_pvid=dfea4b0a-0072-4829-b8fc-db8e3916bd6b&algo_exp_id=dfea4b0a-0072-4829-b8fc-db8e3916bd6b-0&pdp_npi=4%40dis%21AED%2123.81%2115.78%21%21%2146.37%2130.74%21%402101fb0b17059984124644963e8d1b%2112000034247715072%21sea%21AE%21119398870%21&curPageLogUid=kbihq7MnU80Q&utparam-url=scene%3Asearch%7Cquery_from%3A
+
+HMI Display Capacitive Touch - Not finalised yet
+https://vi.aliexpress.com/item/3256803196966562.html?spm=a2g0o.store_pc_home.0.0.241911443ZaYY2&pdp_npi=4%40dis%21EUR%21%E2%82%AC%2017%2C63%21%E2%82%AC%2017%2C63%21%21%2118.75%2118.75%21%40%2112000025523568910%21sh%21%21%21&gatewayAdapt=glo2vnm4itemAdapt
