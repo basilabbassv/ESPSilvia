@@ -10,6 +10,7 @@ Features.
 7. Supports dual HX711 chips. You can use just one too in by making the load cells parallel.
 8. Support additional push button switches wiht led control. 
 9. Supports dual channel SSR control for solennod valve. 
+10. Supports firmware upgrades with WIFI after first wired firmware update.
 
 Parts List. 
 
