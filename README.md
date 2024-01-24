@@ -1,6 +1,7 @@
 ESP32 powered Rancilio Silvia
 
 You can support me on Patreon patreon.com/ESPSilvia
+DISCORD: https://discord.gg/pGMEaEub
 
 Features.
 1. Wifi and Bluetooth Enabaled.
