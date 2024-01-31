@@ -70,17 +70,18 @@ ZACwire Sensor(TEMPERATURE_SENSOR_PIN,306);
 #define ULKA_PIN_OUTPUT 3
 #define outputPin  22 
 #define zerocross  23
-#define ULKA_MIN_POWER 30
-#define ULKA_MAX_POWER 97 
+#define ULKA_MIN_POWER 0
+#define ULKA_MAX_POWER 25 
 //dimmerLamp ulka(outputPin, zerocross);
 double ulkaSetpoint, ulkaInput, ulkaOutput, ulkaPower;
-Smoothed <int> ulkaPowerAverage;
+//Smoothed <int> ulkaPowerAverage;
 double ulkaKp=30.0, ulkaKi=20 , ulkaKd=0;
 PID pumpPID(&ulkaInput, &ulkaOutput, &ulkaSetpoint, ulkaKp, ulkaKi, ulkaKd, DIRECT);
 
-hw_timer_t *ulkaPulseTimer = NULL;
-int frequencyCounter = 0;
-int pulsesRequiredPerSecond = 1;
+hw_timer_t *ulkaPulseTimer  = NULL;
+int frequencyCounter        = 0;
+int pulsesRequiredPerSecond = 0;
+#define LINE_FREQUENCY        25
 
 
 //Default Extraction Profile
@@ -437,7 +438,7 @@ void calibratePressureSensor(){
 
 void testUlkaPump(){
   currentMachineState=ULKAPUMPTEST;
-  ulkaPower = ulkaPower + 5;
+  ulkaPower = ulkaPower + 1;
 }
 
 void flush(){
@@ -557,11 +558,12 @@ void preInfuse (float seconds, float pressure, int setting, float temperature, i
 //***********************************************************************//
 
 void IRAM_ATTR zcTrigger(){
-  timerRestart(ulkaPulseTimer);
+  timerAlarmWrite(ulkaPulseTimer, 20000, true);
+  timerAlarmEnable(ulkaPulseTimer);
 }
 
 void IRAM_ATTR onUlkaPulseTimer(){
-  if (frequencyCounter < 50){
+  if (frequencyCounter < LINE_FREQUENCY){
     detachInterrupt(zerocross);
     if (frequencyCounter < pulsesRequiredPerSecond){
       digitalWrite(outputPin, HIGH); 
@@ -572,11 +574,12 @@ void IRAM_ATTR onUlkaPulseTimer(){
     frequencyCounter = frequencyCounter + 1;
   }
   else {
-    frequencyCounter = 0;
-    timerStop(ulkaPulseTimer);
-    timerRestart(ulkaPulseTimer);
+   frequencyCounter = 0;
+    //timerStop(ulkaPulseTimer);
+    //timerRestart(ulkaPulseTimer);
     attachInterrupt(zerocross, zcTrigger, RISING);
-  } 
+  }
+
 }
 
 
@@ -586,13 +589,13 @@ void setupUlkaPump(){
 
   pumpPID.SetMode(AUTOMATIC);
   
-  ulkaPowerAverage.begin(SMOOTHED_AVERAGE, 30);
-  ulkaPowerAverage.clear();
+  //ulkaPowerAverage.begin(SMOOTHED_AVERAGE, 30);
+  //ulkaPowerAverage.clear();
 
   ulkaPulseTimer = timerBegin(0,80,true);
   timerAttachInterrupt(ulkaPulseTimer, &onUlkaPulseTimer, true); 
-  timerAlarmWrite(ulkaPulseTimer, 20000, true);
-  timerAlarmEnable(ulkaPulseTimer);
+  //timerAlarmWrite(ulkaPulseTimer, 20000, true);
+  //timerAlarmEnable(ulkaPulseTimer);
 
   pinMode(zerocross, INPUT);
   pinMode(outputPin, OUTPUT);
@@ -608,17 +611,17 @@ void updatePump (double barsPerSecond, double targetPressure, double targetFlowR
       pumpPID.SetTunings(0,0,0);
       pumpPID.Compute();
       ulkaPower = 0;
-      ulkaPowerAverage.add(ulkaPower);
+      //ulkaPowerAverage.add(ulkaPower);
       break;
     
     case PREINFUSING:
       ulkaInput = getCurrentPressure();
       ulkaSetpoint = preInfusionPressure;
-      pumpPID.SetTunings(4,5,10);
+      pumpPID.SetTunings(1,10,5);
 
       pumpPID.Compute();
       ulkaPower = map(ulkaOutput,0,255,ULKA_MIN_POWER,ULKA_MAX_POWER);
-      ulkaPowerAverage.add(ulkaPower);
+      //ulkaPowerAverage.add(ulkaPower);
       break;
 
     case EXTRACTION:
@@ -628,21 +631,21 @@ void updatePump (double barsPerSecond, double targetPressure, double targetFlowR
 
       ulkaInput = getCurrentPressure();
       ulkaSetpoint = coffeeExtractionPressure;
-      pumpPID.SetTunings(4,7,6);
+      pumpPID.SetTunings(1,10,5);
 
       pumpPID.Compute();
       ulkaPower = map(ulkaOutput,0,255,ULKA_MIN_POWER,ULKA_MAX_POWER);
-      ulkaPowerAverage.add(ulkaPower);
+      //ulkaPowerAverage.add(ulkaPower);
       break;
 
     case STEAMING:
       ulkaInput = getCurrentPressure();
       ulkaSetpoint = steamingPressure;
-      pumpPID.SetTunings(4,7,6);
+      pumpPID.SetTunings(1,10,5);
 
       pumpPID.Compute();
       ulkaPower = map(ulkaOutput,0,255,ULKA_MIN_POWER,ULKA_MAX_POWER);
-      ulkaPowerAverage.add(ulkaPower);
+      //ulkaPowerAverage.add(ulkaPower);
 
       break;
 
@@ -650,6 +653,7 @@ void updatePump (double barsPerSecond, double targetPressure, double targetFlowR
 
       break;
   }
+  pulsesRequiredPerSecond = ulkaPower;
   //ulka.setPower(ulkaPower);
   //ulka.setPower(ulkaPowerAverage.get());
   
@@ -671,7 +675,7 @@ void updateJSONData(){
   doc["T"]=tempC;
   doc["S"]=currentMachineState;
   //doc["UP"]=ulka.getPower();
-  doc["UP"]=ulkaPowerAverage.get();
+  doc["UP"]=pulsesRequiredPerSecond;
   doc["SOL"]=getSolenoidStatus();
   doc["UPID"]=ulkaOutput;
 
